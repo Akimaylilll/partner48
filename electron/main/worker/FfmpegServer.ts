@@ -5,7 +5,7 @@ import ffprobePath from 'ffprobe-static';
 const source = process.argv[2];
 const liveId = process.argv[3];
 const host = process.argv[4];
-const port = process.argv[5];
+const port = 8935;
 
 ffmpeg.setFfmpegPath(ffmpegPath.replace(
   'app.asar',

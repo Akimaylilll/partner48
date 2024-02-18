@@ -11,6 +11,7 @@ import { getPort } from "portfinder";
 import { MEDIA_SERVER_RTMP_PORT, LIVE_PORT, DANMAKU_PORT } from "../config/index";
 import Store from 'electron-store';
 import { MainBrowserWin } from "../types/index";
+import { checkAndKillPort } from '../utils/system';
 
 export class MainWin {
   private win: MainBrowserWin | null = null;
@@ -48,30 +49,7 @@ export class MainWin {
       }));
       app.emit("window-all-closed");
     });
-    const _that = this;
-    const template = Menu.buildFromTemplate([
-      {
-        label: '设置', submenu: [
-          {
-            label: '弹幕令牌', click: function () {
-              new KeyWin(_that.win);
-            }
-          },
-          {
-            label: 'NodeMediaServer', click: function () {
-              new NodeMediaWin();
-            }
-          },
-        ]
-      },
-      {
-        label: '关于', click: function () {
-          new AboutWin();
-        }
-      }
-    ]);
-    Menu.setApplicationMenu(template);
-  
+
     if (process.env.VITE_DEV_SERVER_URL) { // electron-vite-vue#298
       this.win.loadURL(url)
       // Open devTool if the app is not packaged
@@ -79,19 +57,23 @@ export class MainWin {
     } else {
       this.win.loadFile(indexHtml)
     }
-  
+
+    checkAndKillPort([MEDIA_SERVER_RTMP_PORT, LIVE_PORT, DANMAKU_PORT]).then(res => {
+      console.log(res);
+    });
+
     //IPC
     new Listeners(this.win);
-    this.runServerAndGetPort().then(data => {
-      if(typeof data !== 'object') {
-        return;
-      }
-      const store = new Store();
-      Object.keys(data).forEach(item => {
-        store.set(item, data[item]);
-      });
-    });
-    
+    // this.runServerAndGetPort().then(data => {
+    //   if(typeof data !== 'object') {
+    //     return;
+    //   }
+    //   const store = new Store();
+    //   Object.keys(data).forEach(item => {
+    //     store.set(item, data[item]);
+    //   });
+    // });
+
     // Test actively push message to the Electron-Renderer
     this.win.webContents.on('did-finish-load', () => {
       this.win?.webContents.send('main-process-message', new Date().toLocaleString())

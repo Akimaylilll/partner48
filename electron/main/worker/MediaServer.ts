@@ -3,8 +3,8 @@ import NodeMediaServer from 'node-media-server';
 
 const numCPUs = require('os').cpus().length;
 
-const rtmp_port = process.argv[2] || 8935;
-const http_port = process.argv[3] || 8936;
+const rtmp_port = 8935;
+const http_port = 8936;
 
 const config = {
   rtmp: {

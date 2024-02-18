@@ -1,6 +1,7 @@
 import { execSync } from 'child_process';
 import os from 'os';
 import treeKill from 'tree-kill';
+import { createServer } from 'net';
 export class Tools {
 	/* 随机字符串 */
 	public static rStr(len: number): string {
@@ -37,9 +38,10 @@ export class Tools {
 					reject(error);
 				}
 			} else {
-				const order = `lsof -i :${port}`;
+				const order = `lsof -i:${port}`;
 				try {
 					const stdout = execSync(order);
+					console.log(stdout);
 					const [pName, pId] = stdout
 						.toString()
 						.trim()

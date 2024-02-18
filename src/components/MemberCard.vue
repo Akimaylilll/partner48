@@ -5,28 +5,17 @@ import { openLiveById } from '../renderer/index';
 import { debounce } from "lodash";
 import { ElCard } from 'element-plus';
 import { ipcRenderer } from 'electron';
+import { LiveInfo } from '../types/globle';
+import { LiveTypeEnum, LiveStatusEnum } from "../enum/globle";
 
 const cursor = ref('pointer');
 const isOpenLivePage = ref(false);
 
-interface LiveList{
-  liveId: string,
-  title: string,
-  coverPath: string,
-  liveType: number,
-  userInfo: {
-    teamLogo: string,
-    nickname: string
-  }
-}
 const props = defineProps({
-  liveList: {
-    type: Array<LiveList>,
-    default: []
-  },
-  recordShow: {
-    type: Boolean,
-    default: false
+  liveInfo: {
+    type: Object as () => LiveInfo,
+    require: true,
+    default: {}
   }
 });
 
@@ -44,29 +33,34 @@ ipcRenderer.on('live-init-success', function (event, args){
   cursor.value = "pointer";
 });
 
+const getSourceURL = (path: string) => {
+  return `https://source.48.cn${path}`;
+}
+
 </script>
 <template>
-  <div v-masonry-tile gutter="10" itemSelector=".grid-item" :fitWidth= "true" class="grid-item" v-for="(o ,index) in liveList" :key="index">
-    <el-card @click="!isOpenLivePage&&openLive(o.liveId, o.userInfo.nickname)">
-      <img :src="`https://source.48.cn${o.coverPath}`" class="cover">
-      <span class="liveType" :style="`background-color: ${o.liveType === 1 ? 'orchid' : 'goldenrod'};`">{{o.liveType === 5 ? '游戏' : o.liveType === 1 ? '视频' : '电台'}}</span>
-      <div style="padding: 14px;">
-        <span>{{o.title}}</span>
-        <div class="bottom clearfix">
-          <img :src="`https://source.48.cn${o.userInfo.teamLogo}`" class="logo">
-          <time class="time"> {{ o.userInfo.nickname }} </time>
+  <el-card @click="!isOpenLivePage&&openLive(liveInfo.liveId, liveInfo.userInfo.nickname)">
+      <img :src="getSourceURL(liveInfo.coverPath)" class="cover">
+      <div class="content">
+        <span class="top-left">{{liveInfo.title.length > 5 ? liveInfo.title.slice(0, 5) + '...' : liveInfo.title}}</span>
+        <span class="top-right">{{ LiveStatusEnum[liveInfo.status as keyof typeof LiveStatusEnum] }}</span>
+        <div class="bottom-left">
+          <img :src="getSourceURL(liveInfo.userInfo.teamLogo)" class="logo">
+          <time class="time"> {{ liveInfo.userInfo.nickname }} </time>
         </div>
+        <span class="bottom-right">{{ LiveTypeEnum[liveInfo.liveType as keyof typeof LiveTypeEnum] }}</span>
       </div>
     </el-card>
-  </div>
 </template>
 <style scoped>
 .cover {
-  width: 288px;
+  width: 100%;
+  border-radius: 8px 8px 0 0;
 }
 .logo{
-  height: 10px;
+  height: 15px;
   padding: 0px;
+  vertical-align: middle;
 }
 .grid-item {
   width: 46%;
@@ -84,5 +78,36 @@ ipcRenderer.on('live-init-success', function (event, args){
   right: 28px;
   padding: 1px 5px 1px 5px;
   border-radius: 5px;
+}
+.content {
+  height: 50px;
+  padding: 5px;
+  position: relative;
+}
+.top-left {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+}
+.top-right {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  border-radius: 5px;
+  background-color: red;
+  padding: 0 5px;
+}
+.bottom-left {
+  position: absolute;
+  bottom: 5px;
+  left: 5px;
+}
+.bottom-right {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  border-radius: 5px;
+  background-color: green;
+  padding: 0 5px;
 }
 </style>

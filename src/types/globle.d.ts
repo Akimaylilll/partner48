@@ -1,0 +1,36 @@
+// 为你的数据类型创建一个接口
+export interface LiveInfo {
+  liveId: string,
+  coverPath: string,
+  title: string,
+  liveType: number,
+  status: number,
+  ctime: string,
+  userInfo: {
+      userId: string,
+      nickname: string,
+      avatar: string,
+      badge: [],
+      level: number,
+      isStar: boolean,
+      friends: string,
+      followers: string,
+      teamLogo: string,
+      signature: string,
+      bgImg: string,
+      vip: boolean,
+      userRole: number,
+      pfUrl: string,
+      effectUser: boolean,
+      realNickName: string,
+      starName: string
+  },
+  liveMode: number,
+  pictureOrientation: number,
+  isCollection: number,
+  inMicrophoneConnection: boolean,
+  coverWidth: number,
+  announcement: string,
+  coverHeight: number,
+  onlineUserNum: number
+}

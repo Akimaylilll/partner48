@@ -3,13 +3,14 @@ import { toRefs, watch, reactive, onMounted, ref } from 'vue';
 import { useStorage } from '@vueuse/core';
 import { getLiveList, getVersion, addAlertMessageListener } from '../renderer/index';
 import { debounce } from "lodash";
+import { LiveInfo } from "../types/globle";
 
 // defineStore 接受两个参数
 //  参数1：仓库的id（字符串）
 //  参数2：options（对象）
 export const useMemberLiveListStore = defineStore('memberLiveList', () => {
-  const liveList = ref([] as any[]);
-  const replayList = ref([] as any[]);
+  const liveList = ref([] as LiveInfo[]);
+  const replayList = ref([] as LiveInfo[]);
   const next = ref("0");
   const isQueryLive = ref(true);
   const showTopLoading = ref(false);
@@ -79,6 +80,7 @@ export const useMemberLiveListStore = defineStore('memberLiveList', () => {
 
   const handleScroll = async (e: any) => {
     const {scrollTop, clientHeight, scrollHeight} = e.target.childNodes[1];
+    console.log(scrollTop);
     if(scrollTop === 0) {
       e.target.childNodes[1].scrollTop = 1;
       showTopLoading.value = true;
