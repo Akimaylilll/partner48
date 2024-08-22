@@ -39,6 +39,7 @@ export class VideoWin {
       resizable: true,
       show: true,
       title: this.liveUser,
+      alwaysOnTop: false,
       webPreferences: {
         nodeIntegration: true,
         // 官网似乎说是默认false，但是这里必须设置contextIsolation
@@ -68,8 +69,13 @@ export class VideoWin {
         await this.restartFfmpegServer();
       }
     });
+    ipcMain.on('win-on-top', async (event, liveId, flag)=>{
+      if(this.liveId === liveId) {
+        this.videoWin.setAlwaysOnTop(flag);
+      }
+    });
     // 通知模态框渲染完成
-    ipcMain.once('modal-accomplish',(event,msg)=>{
+    ipcMain.once('modal-accomplish',(event, msg)=>{
       // 发送给渲染进程
       if(this.videoWin.isDestroyed()) {
         return;
@@ -95,8 +101,8 @@ export class VideoWin {
           }
         } else {
           const store = new Store();
-          const live_port = store.get("LIVE_PORT");
-          const danmu_port = store.get("DANMAKU_PORT");
+          const live_port = store.get("port.LIVE_PORT");
+          const danmu_port = store.get("port.DANMAKU_PORT");
           this.danmuData = await this.getDanmuData(content.msgFilePath);
           this.videoWin.webContents.send('open-video-id', this.liveId,
           this.liveUser, this.source, this.liveType,
@@ -108,14 +114,12 @@ export class VideoWin {
 
   public closeFfmpegServer() {
     this.isClosed = true;
-    // setTimeout(() => {
-      this.timer && clearInterval(this.timer);
-      this.timer = null;
-      ipcMain.emit("main-delete-childProcess", true, this.ffmpegServer);
-      this.killAllPids().then(() => {
-        log.log("kill all pids");
-      })
-    // }, 5000);
+    this.timer && clearInterval(this.timer);
+    this.timer = null;
+    ipcMain.emit("main-delete-childProcess", true, this.ffmpegServer);
+    this.killAllPids().then(() => {
+      log.log("kill all pids");
+    });
   }
 
   public killAllPids(isRestart: boolean = false) {
@@ -154,7 +158,7 @@ export class VideoWin {
     const source = this.source;
     const liveId = this.liveId.toString();
     const host = "localhost";
-    const port = (new Store()).get("MEDIA_SERVER_RTMP_PORT") as string || "8935"
+    const port = (new Store()).get("port.MEDIA_SERVER_RTMP_PORT") as string || "8935"
     const ffmpegServerFile = resolve(join(__dirname, 'worker', `FfmpegServer.js`)).replace(/\\/g, '/');
     this.ffmpegServer = fork(ffmpegServerFile,
       [source, liveId, host, port], {
@@ -218,8 +222,8 @@ export class VideoWin {
       log.error(Buffer.from(result).toString());
     });
     const store = new Store();
-    const live_port = store.get("LIVE_PORT");
-    const danmu_port = store.get("DANMAKU_PORT");
+    const live_port = store.get("port.LIVE_PORT");
+    const danmu_port = store.get("port.DANMAKU_PORT");
     this.videoWin?.webContents.send('open-video-id', this.liveId,
       this.liveUser, this.source, this.liveType,
       this.danmuData, this.roomId, danmu_port, live_port);

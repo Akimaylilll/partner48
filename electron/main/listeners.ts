@@ -90,8 +90,8 @@ export class Listeners {
     });
     ipcMain.on('get-port-query', (event, ...args) => {
       const store = new Store();
-      const live_port = store.get("LIVE_PORT");
-      const danmu_port = store.get("DANMAKU_PORT");
+      const live_port = store.get("port.LIVE_PORT");
+      const danmu_port = store.get("port.DANMAKU_PORT");
       event.reply('get-port-reply', {danmu_port, live_port});
     });
 

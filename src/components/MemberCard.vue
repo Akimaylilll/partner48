@@ -43,12 +43,18 @@ const getSourceURL = (path: string) => {
       <img :src="getSourceURL(liveInfo.coverPath)" class="cover">
       <div class="content">
         <span class="top-left">{{liveInfo.title.length > 5 ? liveInfo.title.slice(0, 5) + '...' : liveInfo.title}}</span>
-        <span class="top-right">{{ LiveStatusEnum[liveInfo.status as keyof typeof LiveStatusEnum] }}</span>
+        <span :class="{
+          'top-right': true,
+          ['bg-color-live-status-' + LiveStatusEnum[liveInfo.status].value]: true
+        }">{{ LiveStatusEnum[liveInfo.status as keyof typeof LiveStatusEnum].label }}</span>
         <div class="bottom-left">
           <img :src="getSourceURL(liveInfo.userInfo.teamLogo)" class="logo">
           <time class="time"> {{ liveInfo.userInfo.nickname }} </time>
         </div>
-        <span class="bottom-right">{{ LiveTypeEnum[liveInfo.liveType as keyof typeof LiveTypeEnum] }}</span>
+        <span :class="{
+          'bottom-right': true,
+          ['bg-color-live-type-' + LiveTypeEnum[liveInfo.liveType].value]: true
+        }">{{ LiveTypeEnum[liveInfo.liveType as keyof typeof LiveTypeEnum].label }}</span>
       </div>
     </el-card>
 </template>
@@ -66,11 +72,8 @@ const getSourceURL = (path: string) => {
   width: 46%;
   padding-bottom: 10px;
   border-radius: 10px;
-  border: transparent 2px solid;
+  border: transparent 3px solid;
   cursor: v-bind(cursor);
-}
-.grid-item:hover {
-  border: #7272cc 2px solid;
 }
 .liveType {
   position: absolute;
@@ -94,7 +97,6 @@ const getSourceURL = (path: string) => {
   top: 5px;
   right: 5px;
   border-radius: 5px;
-  background-color: red;
   padding: 0 5px;
 }
 .bottom-left {
@@ -107,7 +109,30 @@ const getSourceURL = (path: string) => {
   bottom: 5px;
   right: 5px;
   border-radius: 5px;
-  background-color: green;
   padding: 0 5px;
+}
+
+.bg-color-live-status-live {
+  background-color: #33FFDD;
+}
+
+.bg-color-live-status-replay {
+  background-color: #FF7744;
+}
+
+.bg-color-live-type-video {
+  background-color: #7744FF;
+}
+.bg-color-live-type-audio {
+  background-color: #FFCC22;
+}
+.bg-color-live-type-lianmai {
+  background-color: yellow;
+}
+.bg-color-live-type-game {
+  background-color: yellow;
+}
+.bg-color-live-type-luping {
+  background-color: #33FFDD;
 }
 </style>

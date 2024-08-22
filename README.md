@@ -17,9 +17,7 @@
 如果您喜欢该项目，欢迎点赞以表示支持，欢迎任何建议或反馈，感谢您的关注和支持！
 
 ## 下载
-- [MACOS版](https://github.com/Akimaylilll/Partner48/releases/download/v1.0.2/Partner48_1.0.2.dmg)
-- [windows版](https://github.com/Akimaylilll/Partner48/releases/download/v1.0.2/Partner48_1.0.2_x64.exe)
-- [windows免安装版](https://github.com/Akimaylilll/Partner48/releases/download/v1.0.2/Partner48_1.0.2_x64-win-unpacked.zip)
+下载地址： https://github.com/Akimaylilll/Partner48/releases/
 
 ## QQ技术交流群
 群号：185044625

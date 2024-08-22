@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
-import { ref, computed, h, createApp } from 'vue';
+import { ref, computed, h, createApp, render } from 'vue';
 import Danmu from "../components/Danmu.vue";
+import Switch from "../components/Switch.vue";
 import { getIMKey, closeLiveWin } from '../renderer/index';
 import { ipcRenderer } from 'electron';
 import DPlayer, { DPlayerEvents } from 'dplayer';
@@ -35,6 +36,8 @@ export const useDPlayerStore = defineStore('dPlayer', () => {
 
   let flvPlayer: flvjs.Player | null = null;
 
+  const isOnTop = ref(false);
+
   const initLive = () => {
     ipcRenderer.on('video-id', function (event, id: string){
       videoId.value = id;
@@ -55,6 +58,7 @@ export const useDPlayerStore = defineStore('dPlayer', () => {
       dPlayer = initVideoPlayer(source, videoId || '', isLive.value === undefined ? true : isLive.value, live_port, danmu_port);
       initDanmu(roomId);
       insertRotationButton();
+      insertWinOnTop();
       isOpenLivePage = false;
       // ipcRenderer.on("ffmpeg-server-close", function() {
       //   closeLive(source, videoId);
@@ -269,6 +273,12 @@ export const useDPlayerStore = defineStore('dPlayer', () => {
     }, 5000);
   }
 
+  const insertWinOnTop = () => {
+    const son = document.createElement('div');
+    document.querySelector('.dplayer-setting-origin-panel')?.insertBefore(son, null);
+    render(h(Switch),son);
+  }
+
   const insertRotationButton = () => {
     const console$ = document.querySelector('.dplayer-setting-origin-panel');
     const child = document.createElement('p');
@@ -324,6 +334,8 @@ export const useDPlayerStore = defineStore('dPlayer', () => {
     initLive,
     clcStyle,
     danmuData,
-    isPointerEvents
+    isPointerEvents,
+    isOnTop,
+    videoId
   }
 })

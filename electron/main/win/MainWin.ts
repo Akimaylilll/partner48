@@ -11,7 +11,7 @@ import { getPort } from "portfinder";
 import { MEDIA_SERVER_RTMP_PORT, LIVE_PORT, DANMAKU_PORT } from "../config/index";
 import Store from 'electron-store';
 import { MainBrowserWin } from "../types/index";
-import { checkAndKillPort } from '../utils/system';
+import { checkAndOperatePorts } from '../utils/system';
 
 export class MainWin {
   private win: MainBrowserWin | null = null;
@@ -32,6 +32,7 @@ export class MainWin {
         nodeIntegrationInWorker: true
       },
     });
+    this.win.menuBarVisible = false;
     this.win.childProcessArray = [];
     this.win.isExit = false;
 
@@ -58,8 +59,20 @@ export class MainWin {
       this.win.loadFile(indexHtml)
     }
 
-    checkAndKillPort([MEDIA_SERVER_RTMP_PORT, LIVE_PORT, DANMAKU_PORT]).then(res => {
-      console.log(res);
+    const store = new Store();
+    store.set('port', {
+      MEDIA_SERVER_RTMP_PORT: MEDIA_SERVER_RTMP_PORT,
+      LIVE_PORT: LIVE_PORT,
+      DANMAKU_PORT: DANMAKU_PORT
+    });
+
+    checkAndOperatePorts(Object.values(store.get('port'))).then((res: number[]) => {
+      res.forEach((port, index) => {
+        store.set('port.' +Object.keys(store.get('port'))[index], port)
+      });
+      console.log(store.get('port'));
+      this.runMediaServer(store.get('port.MEDIA_SERVER_RTMP_PORT'), store.get('port.LIVE_PORT'));
+      this.runDanmuServer(store.get('port.DANMAKU_PORT'));
     });
 
     //IPC
@@ -143,34 +156,5 @@ export class MainWin {
   runDanmuServer(port) {
     const danmuServerFile = resolve(join(__dirname, 'worker', `DanmuServer.js`)).replace(/\\/g, '/');;
     this.forkChild(danmuServerFile, [port]);
-  }
-
-  runServerAndGetPort() {
-    const _that = this;
-    return new Promise(function(res, rej) {
-      const object = {
-        "MEDIA_SERVER_RTMP_PORT": MEDIA_SERVER_RTMP_PORT,
-        "LIVE_PORT": LIVE_PORT,
-        "DANMAKU_PORT": DANMAKU_PORT
-      };
-      Promise.all(Object.keys(object).map(item => {
-        return new Promise(function(resolve, reject){
-          getPort({port: object[item]} , function(err, port){
-            if(err) {
-              reject(err);
-            }
-            object[item] = port;
-            resolve(object);
-          });
-        });
-      })).then(() => {
-        console.log(object)
-        _that.runMediaServer(object["MEDIA_SERVER_RTMP_PORT"], object["LIVE_PORT"]);
-        _that.runDanmuServer(object["DANMAKU_PORT"]);
-        res(object);
-      }).catch(err => {
-        rej(err);
-      })
-    });
   }
 }

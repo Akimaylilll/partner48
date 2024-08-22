@@ -15,6 +15,9 @@ export const useMemberLiveListStore = defineStore('memberLiveList', () => {
   const isQueryLive = ref(true);
   const showTopLoading = ref(false);
   const showBottomLoading = ref(false);
+  const searchArr = ref([]);
+  const searchInput = ref("");
+  const sidebarShow = ref(true);
 
   const reSetReplayDict = (list: Array<any>) => {
     const replayDict: {[key: string]: any} = {};
@@ -58,7 +61,7 @@ export const useMemberLiveListStore = defineStore('memberLiveList', () => {
     }, 5000);
   }
 
-  const getMemberList = debounce(async () => {
+  const getMemberList = async () => {
     let lastLiveListLength = 0;
     if(isQueryLive.value) {
       const liveData: any = await getLiveList(true, next.value);
@@ -73,38 +76,22 @@ export const useMemberLiveListStore = defineStore('memberLiveList', () => {
         next.value = replayData.next;
       }
     }, 1000);
-  }, 1000, {
-    leading: true,
-    trailing: false
-  });
+  };
 
-  const handleScroll = async (e: any) => {
-    const {scrollTop, clientHeight, scrollHeight} = e.target.childNodes[1];
-    console.log(scrollTop);
-    if(scrollTop === 0) {
-      e.target.childNodes[1].scrollTop = 1;
-      showTopLoading.value = true;
-      await initMemberList();
-      showTopLoading.value = false;
-      return;
-    }
-    //滚动条未触底
-    if (scrollTop + clientHeight < scrollHeight - 1) {
-      return;
-    }
-    showBottomLoading.value = true;
-    await getMemberList();
-    showBottomLoading.value = false;
-  }
   return {
     reSetReplayDict,
+    initMessage,
     initPage,
-    handleScroll,
+    getMemberList,
     liveList,
     replayList,
     next,
     isQueryLive,
     showTopLoading,
-    showBottomLoading
+    showBottomLoading,
+    initMemberList,
+    searchArr,
+    searchInput,
+    sidebarShow
   }
 });

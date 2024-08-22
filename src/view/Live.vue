@@ -2,17 +2,20 @@
 import { ipcRenderer } from 'electron';
 import { ref, onMounted, computed, watch, toRefs, createApp, h, reactive, nextTick } from 'vue';
 import Danmu from "../components/Danmu.vue";
+import Switch from "../components/Switch.vue";
 import { useDPlayerStore } from '../store/useDPlayerStore';
 import { closeLiveWin } from '../renderer/index';
 import { storeToRefs } from "pinia";
 
 const dPlayerStore = useDPlayerStore();
 const { initLive } = dPlayerStore;
-const { danmuData, clcStyle, isPointerEvents } = storeToRefs(dPlayerStore);
+const { clcStyle, isPointerEvents } = storeToRefs(dPlayerStore);
 
-nextTick(() => {
-  ipcRenderer.send('modal-accomplish');
-  initLive();
+onMounted(() => {
+  nextTick(() => {
+    ipcRenderer.send('modal-accomplish');
+    initLive();
+  });
 });
 watch(isPointerEvents, (newVal) => {
   document.getElementById('myVideo')?.style.setProperty("--danmu-pointer-events", newVal ? 'auto' : 'none');

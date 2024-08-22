@@ -5,7 +5,7 @@
 
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: var(--v-bg-color);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -77,8 +77,8 @@ code {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    color: var(--v-color);
+    background-color: var(--v-bg-color);
   }
   a:hover {
     color: #747bff;
@@ -89,4 +89,22 @@ code {
   code {
     background-color: #f9f9f9;
   }
+}
+
+html {
+  --theme-color: #646cff;
+  --v-color: #000;
+  --v-bg-color: #cfcccc;
+  --sidebar-bg-color: #f2f2f2;
+  --sidebar-color: #000;
+  --card-bg-color:#e6e8e9;
+}
+
+html.dark {
+  --v-color: #fff;
+  --v-bg-color: #3a3a3a;
+  --sidebar-bg-color: #1a1a1a;
+  --sidebar-color: #fff;
+  --card-bg-color: #332f2f;
+  --el-color-primary: #409eff;
 }
